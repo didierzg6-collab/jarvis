@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JARVIS Agronomie</title>
+<meta name="theme-color" content="#050c13">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600&family=Figtree:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#050c13;--s1:#0b1823;--s2:#112535;--ln:#1b3b53;--tx:#d9edf6;--mu:#8aa8bc;--cy:#34e3ff;--cy2:#1b9fc2;--gr:#6fdc9a;--am:#ffb347;--rd:#ff7a7a;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
+body{height:100%;margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 Figtree,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+[hidden]{display:none!important}
+#app{height:100%;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--ln)}
+h1{margin:0;font:600 19px/1.1 "Chakra Petch",system-ui,sans-serif;letter-spacing:.02em}
+h1 small{display:block;font:500 12px/1.3 Figtree,system-ui,sans-serif;color:var(--mu);letter-spacing:0}
+.orb{width:40px;height:40px;flex:none}
+.orb circle,.orb path{fill:none;stroke-linecap:round;transform-box:fill-box;transform-origin:center}
+.r1{stroke:var(--cy);stroke-width:1.3;stroke-dasharray:7 5;animation:spin 28s linear infinite}
+.r2{stroke:var(--cy2);stroke-width:1.1;stroke-dasharray:2 4;animation:spin 16s linear infinite reverse}
+.orb .core{fill:var(--cy);stroke:none;filter:drop-shadow(0 0 5px var(--cy))}
+.tick{stroke:var(--cy2);stroke-width:1.3}
+.busy .core{animation:pulse 1s ease-in-out infinite}
+.busy .r1{animation-duration:3s}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{opacity:.35;transform:scale(.6)}}
+select,input,textarea,button{font:inherit;color:inherit}
+select,input[type=text],input[type=password],textarea{background:var(--s1);border:1px solid var(--ln);border-radius:10px;padding:10px 12px;min-height:44px;width:100%}
+#scope{margin-left:auto;width:auto;max-width:48%;min-height:40px;padding:6px 10px}
+.view{flex:1;min-height:0;overflow:auto;padding:14px}
+#msgs{display:flex;flex-direction:column;gap:12px}
+.msg{max-width:94%;padding:10px 13px;border:1px solid var(--ln);overflow-wrap:anywhere}
+.msg p{margin:0 0 .6em}.msg p:last-child{margin:0}
+.msg ul,.msg ol{margin:.2em 0 .6em;padding-left:1.3em}
+.msg h4{margin:.4em 0;font:600 15px "Chakra Petch",sans-serif;color:var(--cy)}
+.u{align-self:flex-end;background:#0d2a3a;border-color:var(--cy2);border-radius:14px 14px 4px 14px;white-space:pre-wrap}
+.a{align-self:flex-start;background:var(--s1);border-radius:14px 14px 14px 4px}
+.a.err{border-color:var(--rd)}
+.ref{color:var(--cy);font-weight:600}
+.think,.mu{color:var(--mu)}
+.errt{color:var(--rd)}
+.src{margin-top:10px;font-size:13px;color:var(--mu)}
+.src summary{cursor:pointer;margin-top:6px}
+.src ol{padding-left:1.2em;margin:.4em 0 0}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;border:1px solid}
+.tag.ok{color:var(--gr);border-color:#2f6b4a}
+.tag.no{color:var(--am);border-color:#7a5420}
+button{cursor:pointer;background:none;border:0}
+.ghost{border:1px solid var(--ln);border-radius:10px;padding:8px 12px;min-height:40px;background:var(--s1)}
+.ghost.danger{border-color:var(--rd);color:var(--rd)}
+.go{background:var(--cy);color:#04141c;border-radius:10px;padding:10px 16px;min-height:44px;font-weight:600;width:100%}
+#composer{border-top:1px solid var(--ln);padding:8px 12px 10px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px}
+.chips button{flex:none;border:1px solid var(--ln);border-radius:99px;padding:6px 12px;font-size:14px;color:var(--mu)}
+.row{display:flex;gap:8px;align-items:flex-end}
+#q{flex:1;min-width:0;width:auto;resize:none;max-height:120px}
+.sq{flex:none;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:var(--cy);color:#04141c}
+#stop{background:var(--s2);color:var(--am);border:1px solid var(--am)}
+nav{display:flex;border-top:1px solid var(--ln);background:var(--s1)}
+nav button{flex:1;min-height:54px;color:var(--mu);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:13px;border-top:2px solid transparent}
+nav button[aria-current=page]{color:var(--cy);border-top-color:var(--cy)}
+.card{background:var(--s1);border:1px solid var(--ln);border-radius:14px;padding:14px;margin-bottom:14px}
+.card h2,.subj-h h3,summary{margin:0 0 8px;font:600 16px "Chakra Petch",sans-serif}
+summary{cursor:pointer}
+label{display:block;margin:0 0 10px;font-size:14px;color:var(--mu)}
+label>*{margin-top:4px;color:var(--tx)}
+.subj-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.doc{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--ln)}
+.doc small{display:block;color:var(--mu)}
+#note{margin:10px 0 0;min-height:1.4em;color:var(--mu)}
+#note.err{color:var(--rd)}#note.ok{color:var(--gr)}
+.empty{color:var(--mu)}
+.row2{display:flex;gap:8px}.row2 input{flex:1;min-width:0}.row2 .go{width:auto;flex:none}
+.sc{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;background:var(--s1);border:1px solid var(--ln);border-radius:14px;padding:14px;margin-bottom:10px;min-height:56px}
+.sc small{display:block;color:var(--mu);font-size:14px}
+#subj-title{margin:14px 0 10px;font:600 20px "Chakra Petch",sans-serif}
+#study{margin-bottom:14px}
+:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+ <svg class="orb" viewBox="0 0 48 48" aria-hidden="true"><circle class="r1" cx="24" cy="24" r="21"/><circle class="r2" cx="24" cy="24" r="14"/><circle class="core" cx="24" cy="24" r="6"/><path class="tick" d="M24 1v6M24 41v6M1 24h6M41 24h6"/></svg>
+ <h1>JARVIS<small>Agronomie</small></h1>
+ <select id="scope" aria-label="Matière interrogée"></select>
+</header>
+
+<section id="chat" class="view"><div id="msgs"></div></section>
+
+<section id="lib" class="view" hidden>
+ <div id="lib-list">
+  <form id="addsub" class="card">
+   <h2>Mes matières</h2>
+   <div class="row2"><input id="newsub" type="text" placeholder="Ex. Biostatistique" aria-label="Nom de la nouvelle matière" autocomplete="off"><button class="go" type="submit">Ajouter</button></div>
+  </form>
+  <div id="subjects"></div>
+ </div>
+ <div id="lib-subj" hidden>
+  <button type="button" class="ghost" id="back">← Mes matières</button>
+  <h2 id="subj-title"></h2>
+  <button type="button" class="go" id="study">Étudier cette matière</button>
+  <form id="imp" class="card">
+  <h2>Ajouter un support de cours</h2>
+  <label>Fichier (PDF avec texte, Word, TXT)<input id="file" type="file" accept=".pdf,.docx,.txt,.md"></label>
+  
+  <label>Catégorie<select id="cat"><option>Cours</option><option>TD</option><option>TP</option><option>Ancienne épreuve</option><option>Correction</option><option>Complément</option></select></label>
+  <button class="go" type="submit">Importer dans cette matière</button>
+  <p id="note" role="status"></p>
+ </form>
+ <div id="docs" class="card"></div>
+  <button type="button" class="ghost" id="delsub">Supprimer la matière et ses documents</button>
+ </div>
+ <details class="card" id="set">
+  <summary>Réglages et données</summary>
+  <label>Précision des réponses<select id="tier"><option value="quick">Rapide (la moins chère)</option><option value="default">Équilibrée</option><option value="complex">Approfondie (la plus chère)</option></select></label>
+  <div id="apibox" hidden>
+   <label>Clé API Anthropic<input id="key" type="password" autocomplete="off" placeholder="sk-ant-…"></label>
+   <p class="mu">Crée-la sur platform.claude.com (« API keys ») après avoir ajouté quelques dollars de crédit. Elle reste sur cet appareil et n’est envoyée qu’à Anthropic : ne la partage jamais.</p>
+  </div>
+  <p class="mu">Tes documents restent sur cet appareil. Seuls les extraits utiles à ta question sont envoyés à Claude.</p>
+  <p class="mu" id="usage"></p>
+  <button type="button" class="ghost" id="inst" hidden>Installer l’application</button>
+  <button type="button" class="ghost" id="clrchat">Effacer l’historique</button>
+  <button type="button" class="ghost" id="clrall">Tout effacer</button>
+ </details>
+</section>
+
+<form id="composer">
+ <div class="chips">
+  <button type="button" data-t="Explique avec des mots simples : ">Explique simplement</button>
+  <button type="button" data-t="Résume le cours en 10 points clés">Résume le cours</button>
+  <button type="button" data-t="Pose-moi 5 questions de quiz, une à la fois, et corrige mes réponses">Quiz</button>
+ </div>
+ <div class="row">
+  <textarea id="q" rows="1" placeholder="Pose ta question…" aria-label="Ta question"></textarea>
+  <button id="send" class="sq" type="submit" aria-label="Envoyer"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+  <button id="stop" class="sq" type="button" hidden aria-label="Arrêter la réponse"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+ </div>
+</form>
+
+<nav>
+ <button id="n-chat" aria-current="page"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>Discuter</button>
+ <button id="n-lib"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4v16H5zM11 4h4v16h-4zM17 6l3 1-3.5 13-3-1z"/></svg>Bibliothèque</button>
+</nav>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script>
+/* ---------- Outils de base ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const STOP=new Set(norm('le la les un une des du de d l et ou en au aux a à ce ces cet cette qui que quoi dont où est sont être ont avoir pour par sur sous dans avec sans plus moins très son sa ses leur leurs mon ma mes ton ta tes il elle ils elles on nous vous je tu se ne pas y comme mais donc or ni car si quel quelle quels quelles fait faire peut explique expliquer donne').split(' '));
+const toks=s=>norm(s).split(/[^a-z0-9]+/).filter(w=>w.length>1&&!STOP.has(w)).map(w=>w.length>3?w.replace(/[sx]$/,''):w);
+
+/* ---------- Stockage local (IndexedDB, repli en mémoire) ---------- */
+const store=(()=>{
+ let db;const mem=new Map();
+ const open=()=>db||(db=new Promise((ok,ko)=>{try{const r=indexedDB.open('jarvis-agro',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error)}catch(e){ko(e)}}));
+ const tx=async(mode,fn)=>{try{const d=await open();return await new Promise((ok,ko)=>{const q=fn(d.transaction('kv',mode).objectStore('kv'));q.onsuccess=()=>ok(q.result);q.onerror=()=>ko(q.error)})}catch(e){return undefined}};
+ return{
+  async get(k){const v=await tx('readonly',s=>s.get(k));return v===undefined?mem.get(k):v},
+  async set(k,v){mem.set(k,v);await tx('readwrite',s=>s.put(v,k))},
+  async del(k){mem.delete(k);await tx('readwrite',s=>s.delete(k))},
+  async keys(){const v=await tx('readonly',s=>s.getAllKeys());return v||[...mem.keys()]}
+ };
+})();
+
+/* ---------- État ---------- */
+const VIEWER=!!window.claude,S={docs:[],chunks:[],turns:[],subs:[],cur:'',scope:'*',tier:VIEWER?'default':'quick',key:'',spent:0,calls:0},MAX=25*1024*1024;
+let sample=null,busy=false,ctl=null;
+window.claude?.use('sample').then(s=>{sample=s}).catch(()=>{});
+const MODELS={quick:'claude-haiku-5-5',default:'claude-sonnet-5-5',complex:'claude-opus-5-5'},PRICE={quick:[.1,.5],default:[2,10],complex:[4,20]};
+
+const RULES=`Tu es JARVIS Agronomie, professeur particulier d’agronomie d’un étudiant francophone. Réponds en français, avec des mots simples.
+1. Appuie-toi d’abord sur les EXTRAITS numérotés ci-dessous et cite-les : [1], [2]… Distingue clairement « Dans ton cours » (ce qui vient des extraits) et « Explication complémentaire » (tes connaissances générales, qui ne viennent pas du cours).
+2. Si les extraits ne contiennent pas la réponse, dis-le d’abord, puis complète. N’invente jamais de définitions, de chapitres, de références ni de liens. Tu n’as pas accès à Internet.
+3. Pédagogie : explique, donne un exemple concret d’agriculture ou d’environnement, puis pose une courte question pour vérifier la compréhension. Pour un calcul, détaille formules, unités et conversions, et vérifie la cohérence du résultat. Si l’étudiant demande la correction complète, donne-la ; sinon guide-le pas à pas.
+4. Une correction que tu produis n’est jamais officielle : précise-le pour les anciennes épreuves.
+5. Format pour écran de téléphone : réponses courtes, listes, pas de tableau Markdown.`;
+
+const ERR={
+ no_claude:'JARVIS ne peut pas joindre Claude depuis cet affichage. Ouvre la page dans l’application Claude.',
+ not_granted:'Accès à Claude refusé. Autorise-le quand la fenêtre apparaît, puis réessaie.',
+ sampling_disabled:'Claude n’est pas disponible pour ce compte.',
+ rate_limited:'Limite d’utilisation atteinte. Attends un moment, puis réessaie.',
+ prompt_too_large:'La demande est trop longue. Choisis une seule matière ou pose une question plus courte.',
+ session_expired:'Session expirée. Reconnecte-toi à Claude, puis réessaie.',
+ refused:'Claude n’a pas pu répondre à cette demande. Reformule-la.',
+ empty_completion:'Aucune réponse reçue. Simplifie ta question.',
+ upstream_error:'Connexion interrompue. Vérifie ta connexion Internet, puis réessaie.',
+ no_key:'Ajoute ta clé API : Bibliothèque → Réglages et données.',
+ bad_key:'Clé API refusée. Vérifie-la dans Réglages et données.',
+ no_credit:'Crédit API insuffisant. Recharge ton compte sur platform.claude.com.'
+};
+
+/* ---------- Découpage et recherche locale dans les cours ---------- */
+function chunkText(t,p){
+ const parts=t.replace(/[ \t]+/g,' ').split(/\n\s*\n|(?<=[.!?;:])\s+/).flatMap(s=>s.length>1000?(s.match(/[\s\S]{1,900}(\s|$)/g)||[s]):[s]);
+ const out=[];let cur='';
+ for(const s of parts){if(cur&&cur.length+s.length>900){out.push({p,t:cur.trim()});cur=''}cur+=s+' '}
+ if(cur.trim().length>30)out.push({p,t:cur.trim()});
+ return out;
+}
+function reindex(){
+ S.chunks=S.docs.flatMap(d=>d.chunks.map(c=>{const w=toks(c.t),tf={};w.forEach(x=>tf[x]=(tf[x]||0)+1);return{name:d.name,subject:d.subject,cat:d.cat,p:c.p,t:c.t,tf,len:w.length||1}}));
+}
+function retrieve(q,cs,k=6){
+ if(!cs.length)return[];
+ if(/r[ée]sum|fiche|quiz|r[ée]vis|plan du cours|points cl[ée]s/i.test(q)){
+  const n=Math.min(10,cs.length),step=cs.length/n;
+  return Array.from({length:n},(_,i)=>cs[Math.floor(i*step)]);
+ }
+ const qt=[...new Set(toks(q))],N=cs.length,avg=cs.reduce((a,c)=>a+c.len,0)/N,df={};
+ qt.forEach(t=>df[t]=cs.reduce((a,c)=>a+(c.tf[t]?1:0),0));
+ return cs.map(c=>({c,s:qt.reduce((a,t)=>{const f=c.tf[t]||0;if(!f)return a;return a+Math.log(1+(N-df[t]+.5)/(df[t]+.5))*f*2.2/(f+1.2*(.25+.75*c.len/avg))},0)}))
+  .filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,k).map(x=>x.c);
+}
+
+/* ---------- Lecture des fichiers ---------- */
+async function readPdf(buf,cb){
+ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+ const pdf=await pdfjsLib.getDocument({data:buf}).promise,out=[];
+ for(let i=1;i<=pdf.numPages;i++){
+  cb(i+'/'+pdf.numPages);
+  const c=await(await pdf.getPage(i)).getTextContent();
+  out.push(c.items.map(x=>x.str+(x.hasEOL?'\n':' ')).join(''));
+ }
+ return out;
+}
+const note=(m,t='')=>{const n=$('#note');n.textContent=m;n.className=t};
+
+$('#imp').onsubmit=async e=>{
+ e.preventDefault();
+ const f=$('#file').files[0],subj=S.cur,cat=$('#cat').value;
+ if(!f||!subj)return note('Choisis un fichier à importer.','err');
+ if(f.size>MAX)return note('Fichier trop volumineux (25 Mo maximum).','err');
+ try{
+  if(S.docs.some(d=>d.name===f.name&&d.subject===subj))throw new Error('Ce document est déjà dans cette matière.');
+  const ext=(f.name.split('.').pop()||'').toLowerCase();
+  let pages;
+  note('Lecture du fichier…');
+  if(ext==='pdf'){
+   if(!window.pdfjsLib)throw new Error('Lecteur PDF indisponible : vérifie ta connexion Internet et recharge la page.');
+   pages=await readPdf(await f.arrayBuffer(),n=>note('Lecture de la page '+n+'…'));
+  }else if(ext==='docx'){
+   if(!window.mammoth)throw new Error('Lecteur Word indisponible : vérifie ta connexion Internet et recharge la page.');
+   pages=[(await mammoth.extractRawText({arrayBuffer:await f.arrayBuffer()})).value];
+  }else if(ext==='txt'||ext==='md')pages=[await f.text()];
+  else throw new Error('Format non pris en charge (PDF, DOCX, TXT ou MD).');
+  const total=pages.join('').trim().length;
+  if(ext==='pdf'&&total<30*pages.length)throw new Error('Ce PDF semble numérisé (images sans texte). La lecture des scans n’est pas encore disponible.');
+  if(total<40)throw new Error('Document vide ou illisible.');
+  const paged=ext==='pdf',chunks=pages.flatMap((t,i)=>chunkText(t,paged?i+1:0));
+  const d={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:f.name,subject:subj,cat,pages:paged?pages.length:0,n:chunks.length,added:Date.now(),chunks};
+  await store.set('doc:'+d.id,d);
+  S.docs.push(d);reindex();renderSubj();
+  $('#file').value='';
+  note('Importé : '+d.n+' passages prêts à être consultés.','ok');
+ }catch(err){
+  const m=err.name==='PasswordException'?'Ce PDF est protégé par un mot de passe.':err.name==='InvalidPDFException'?'Fichier PDF invalide ou corrompu.':err.message;
+  note('Import impossible. '+m,'err');
+ }
+};
+
+/* ---------- Affichage ---------- */
+function md(s){
+ const inl=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\[(\d{1,2})\]/g,'<sup class="ref">$1</sup>');
+ let h='',list=null,m;
+ const close=()=>{if(list){h+='</'+list+'>';list=null}};
+ for(const l of s.split('\n')){
+  if(m=l.match(/^\s*[-*•]\s+(.*)/)){if(list!=='ul'){close();h+='<ul>';list='ul'}h+='<li>'+inl(m[1])+'</li>'}
+  else if(m=l.match(/^\s*\d+[.)]\s+(.*)/)){if(list!=='ol'){close();h+='<ol>';list='ol'}h+='<li>'+inl(m[1])+'</li>'}
+  else{close();if(m=l.match(/^#{1,4}\s+(.*)/))h+='<h4>'+inl(m[1])+'</h4>';else if(l.trim())h+='<p>'+inl(l)+'</p>'}
+ }
+ close();return h;
+}
+const toEnd=()=>{const c=$('#chat');c.scrollTop=c.scrollHeight};
+function addMsg(role,html){const d=document.createElement('div');d.className='msg '+(role==='user'?'u':'a');d.innerHTML=html;$('#msgs').append(d);toEnd();return d}
+function srcBlock(src){
+ const d=document.createElement('div');d.className='src';
+ d.innerHTML=src.length
+  ?'<span class="tag ok">'+src.length+' extrait'+(src.length>1?'s':'')+' de tes cours fourni'+(src.length>1?'s':'')+'</span><details><summary>Voir les extraits</summary><ol>'+src.map(s=>'<li><b>'+esc(s.n)+'</b>'+(s.p?' · p. '+s.p:'')+'<br><small>'+esc(s.t)+'…</small></li>').join('')+'</ol></details>'
+  :'<span class="tag no">Aucun extrait trouvé dans tes cours</span>';
+ return d;
+}
+function renderChat(){
+ $('#msgs').innerHTML='';
+ if(!S.turns.length)addMsg('assistant','<p><b>Bonjour, je suis JARVIS.</b> Ton professeur particulier d’agronomie.</p><p>Importe tes cours dans la Bibliothèque, puis pose-moi une question. Je m’appuie d’abord sur tes documents et je te préviens quand je complète avec mes connaissances générales.</p><p class="mu">Cette version ne fait pas de recherche sur Internet. Seuls les extraits utiles à ta question sont envoyés à Claude.</p>');
+ S.turns.forEach(t=>{if(t.role==='user')addMsg('user',esc(t.content));else{const b=addMsg('assistant',md(t.content));b.append(srcBlock(t.src||[]))}});
+}
+function fillScope(){
+ const subs=S.subs;
+ if(S.scope!=='*'&&!subs.includes(S.scope))S.scope='*';
+ $('#scope').innerHTML='<option value="*">Toutes les matières</option>'+subs.map(s=>'<option value="'+esc(s)+'">'+esc(s)+'</option>').join('');
+ $('#scope').value=S.scope;
+ 
+}
+function renderLib(){
+ $('#subjects').innerHTML=S.subs.map(s=>{const n=S.docs.filter(d=>d.subject===s).length;return '<button class="sc" data-open="'+esc(s)+'"><span><b>'+esc(s)+'</b><small>'+n+' document'+(n>1?'s':'')+'</small></span><span aria-hidden="true">›</span></button>'}).join('')
+  ||'<p class="empty">Aucune matière pour l’instant. Ajoute ta première matière ci-dessus.</p>';
+}
+function renderSubj(){
+ $('#subj-title').textContent=S.cur;
+ $('#docs').innerHTML=S.docs.filter(d=>d.subject===S.cur).map(d=>'<div class="doc"><div><b>'+esc(d.name)+'</b><small>'+esc(d.cat)+' · '+(d.pages?d.pages+' p.':'texte')+' · '+d.n+' passages</small></div><button class="ghost" data-del="'+d.id+'">Supprimer</button></div>').join('')
+  ||'<p class="empty">Aucun support dans cette matière. Importe ton premier cours ci-dessus.</p>';
+}
+function openSub(s){S.cur=s;renderSubj();note('');$('#lib-list').hidden=true;$('#set').hidden=true;$('#lib-subj').hidden=false}
+function closeSub(){S.cur='';renderLib();$('#lib-subj').hidden=true;$('#lib-list').hidden=false;$('#set').hidden=false}
+function show(v){
+ ['chat','lib'].forEach(x=>{$('#'+x).hidden=x!==v;const n=$('#n-'+x);x===v?n.setAttribute('aria-current','page'):n.removeAttribute('aria-current')});
+ $('#composer').hidden=v!=='chat';if(v==='chat')toEnd();
+}
+function confirm2(b,fn){
+ if(!b.classList.contains('danger')){const t=b.textContent;b.classList.add('danger');b.textContent='Confirmer';setTimeout(()=>{b.classList.remove('danger');b.textContent=t},4000);return}
+ fn();
+}
+const setBusy=v=>{busy=v;document.body.classList.toggle('busy',v);$('#send').hidden=v;$('#stop').hidden=!v};
+
+/* ---------- Connexion à Claude : compte Claude (dans l’appli Claude) ou clé API ---------- */
+const NL=String.fromCharCode(10);
+const cfg=()=>({tier:S.tier,key:S.key,spent:S.spent,calls:S.calls});
+const showUsage=()=>{$('#usage').textContent=VIEWER?'':'Dépense estimée : '+S.spent.toFixed(4)+' $ pour '+S.calls+' réponse(s) (estimation : vérifie sur platform.claude.com).'};
+async function callClaude(input,onText,signal){
+ if(sample)return sample(input,{cache:false,modelTier:S.tier,signal,onText:({text})=>onText(text)});
+ if(VIEWER)throw{code:'no_claude'};
+ if(!S.key)throw{code:'no_key'};
+ let r;
+ try{r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',signal,headers:{'content-type':'application/json','x-api-key':S.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:MODELS[S.tier],max_tokens:6000,stream:true,messages:input})})}
+ catch(e){throw{code:e.name==='AbortError'?'cancelled':'upstream_error'}}
+ if(!r.ok){
+  let m='';try{m=(await r.json()).error.message||''}catch(e){}
+  throw{code:r.status===401||r.status===403?'bad_key':r.status===429?'rate_limited':/credit/i.test(m)?'no_credit':r.status===413?'prompt_too_large':'upstream_error'};
+ }
+ const rd=r.body.getReader(),dec=new TextDecoder();
+ let buf='',text='',tin=0,tout=0,stop='';
+ try{
+  for(;;){
+   const x=await rd.read();if(x.done)break;
+   buf+=dec.decode(x.value,{stream:true});
+   let i;
+   while((i=buf.indexOf(NL+NL))>=0){
+    const ev=buf.slice(0,i);buf=buf.slice(i+2);
+    const ln=ev.split(NL).find(l=>l.startsWith('data:'));if(!ln)continue;
+    let j;try{j=JSON.parse(ln.slice(5))}catch(e){continue}
+    if(j.type==='content_block_delta'&&j.delta.type==='text_delta'){text+=j.delta.text;onText(text)}
+    else if(j.type==='message_start')tin=j.message.usage.input_tokens||0;
+    else if(j.type==='message_delta'){tout=(j.usage&&j.usage.output_tokens)||tout;stop=(j.delta&&j.delta.stop_reason)||stop}
+    else if(j.type==='error')throw{code:'upstream_error'};
+   }
+  }
+ }catch(e){throw{code:e.code||(e.name==='AbortError'?'cancelled':'upstream_error'),text}}
+ if(!text)throw{code:'empty_completion'};
+ S.calls++;S.spent+=(tin*PRICE[S.tier][0]+tout*PRICE[S.tier][1])/1e6;store.set('cfg',cfg());showUsage();
+ return{text,truncated:stop==='max_tokens'};
+}
+
+/* ---------- Poser une question à Claude ---------- */
+async function ask(q){
+ q=q.trim();if(busy||!q)return;
+ const ub=addMsg('user',esc(q));
+ const hits=retrieve(q,S.chunks.filter(c=>S.scope==='*'||c.subject===S.scope));
+ const ctx=hits.map((h,i)=>`[${i+1}] ${h.name}${h.p?' · p. '+h.p:''} (${h.subject}, ${h.cat})\n${h.t}`).join('\n\n')||'(aucun passage trouvé dans les documents importés)';
+ const input=[...S.turns.slice(-6).map(t=>({role:t.role,content:t.content})),{role:'user',content:`${RULES}\n\nEXTRAITS DES COURS :\n${ctx}\n\nQUESTION DE L’ÉTUDIANT :\n${q}`}];
+ setBusy(true);
+ const ab=addMsg('assistant','<span class="think">JARVIS réfléchit…</span>');
+ ctl=new AbortController();
+ try{
+  const r=await callClaude(input,t=>{ab.innerHTML=md(t);toEnd()},ctl.signal);
+  const src=hits.map(h=>({n:h.name,p:h.p,t:h.t.slice(0,260)}));
+  S.turns.push({role:'user',content:q},{role:'assistant',content:r.text,src});
+  S.turns=S.turns.slice(-40);store.set('chat',S.turns);
+  ab.innerHTML=md(r.text)+(r.truncated?'<p class="mu">Réponse coupée : écris « continue » pour la suite.</p>':'');
+  ab.append(srcBlock(src));
+ }catch(e){
+  const code=e&&e.code,part=e&&e.text?md(e.text):'';
+  if(code==='cancelled'){ab.innerHTML=part+'<p class="mu">Réponse arrêtée.</p>';return}
+  ab.classList.add('err');
+  ab.innerHTML=part+'<p class="errt">'+esc(ERR[code]||'Erreur inattendue ('+(code||'inconnue')+').')+'</p>';
+  const rb=document.createElement('button');rb.className='ghost';rb.textContent='Réessayer';
+  rb.onclick=()=>{ub.remove();ab.remove();ask(q)};ab.append(rb);
+ }finally{setBusy(false);toEnd()}
+}
+
+/* ---------- Branchements ---------- */
+const grow=()=>{const q=$('#q');q.style.height='auto';q.style.height=Math.min(q.scrollHeight,120)+'px'};
+$('#q').oninput=grow;
+$('#q').onkeydown=e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();$('#composer').requestSubmit()}};
+$('#composer').onsubmit=e=>{e.preventDefault();const v=$('#q').value;if(!v.trim()||busy)return;$('#q').value='';grow();ask(v)};
+$('#stop').onclick=()=>ctl&&ctl.abort();
+document.querySelectorAll('.chips button').forEach(b=>b.onclick=()=>{const q=$('#q');q.value=b.dataset.t;q.focus();grow()});
+$('#n-chat').onclick=()=>show('chat');
+$('#n-lib').onclick=()=>show('lib');
+$('#scope').onchange=e=>{S.scope=e.target.value};
+$('#tier').onchange=e=>{S.tier=e.target.value;store.set('cfg',cfg())};
+$('#key').onchange=e=>{S.key=e.target.value.trim();store.set('cfg',cfg())};
+let dip;addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;$('#inst').hidden=false});
+$('#inst').onclick=()=>dip&&dip.prompt();
+if('serviceWorker' in navigator&&!VIEWER&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+$('#subjects').onclick=e=>{const b=e.target.closest('button');if(b&&b.dataset.open)openSub(b.dataset.open)};
+$('#docs').onclick=e=>{
+ const b=e.target.closest('button');if(!b||!b.dataset.del)return;
+ confirm2(b,async()=>{await store.del('doc:'+b.dataset.del);S.docs=S.docs.filter(d=>d.id!==b.dataset.del);reindex();renderSubj()});
+};
+$('#addsub').onsubmit=async e=>{
+ e.preventDefault();
+ const v=$('#newsub').value.trim();if(!v)return;
+ const ex=S.subs.find(s=>s.toLowerCase()===v.toLowerCase());
+ $('#newsub').value='';
+ if(ex)return openSub(ex);
+ S.subs=[...S.subs,v].sort((a,b)=>a.localeCompare(b,'fr'));
+ await store.set('subs',S.subs);fillScope();renderLib();
+};
+$('#back').onclick=closeSub;
+$('#study').onclick=()=>{S.scope=S.cur;fillScope();show('chat')};
+$('#delsub').onclick=e=>confirm2(e.target,async()=>{
+ for(const d of S.docs.filter(x=>x.subject===S.cur))await store.del('doc:'+d.id);
+ S.docs=S.docs.filter(x=>x.subject!==S.cur);S.subs=S.subs.filter(s=>s!==S.cur);
+ await store.set('subs',S.subs);reindex();fillScope();closeSub();
+});
+$('#clrchat').onclick=e=>confirm2(e.target,()=>{S.turns=[];store.del('chat');renderChat();show('chat')});
+$('#clrall').onclick=e=>confirm2(e.target,async()=>{
+ for(const k of await store.keys())await store.del(k);
+ S.docs=[];S.turns=[];S.subs=[];S.key='';S.spent=0;S.calls=0;S.scope='*';$('#key').value='';reindex();fillScope();renderLib();renderChat();showUsage();$('#usage').textContent='Toutes les données locales ont été effacées.';
+});
+
+/* ---------- Démarrage ---------- */
+(async()=>{
+ const ks=await store.keys();
+ S.docs=(await Promise.all(ks.filter(k=>String(k).startsWith('doc:')).map(k=>store.get(k)))).filter(Boolean).sort((a,b)=>a.added-b.added);
+ S.turns=(await store.get('chat'))||[];
+ S.subs=[...new Set([...((await store.get('subs'))||[]),...S.docs.map(d=>d.subject)])].sort((a,b)=>a.localeCompare(b,'fr'));
+ const c=await store.get('cfg');if(c){S.tier=c.tier||S.tier;S.key=c.key||'';S.spent=c.spent||0;S.calls=c.calls||0}
+ $('#tier').value=S.tier;$('#key').value=S.key;$('#apibox').hidden=VIEWER;showUsage();
+ if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
+ reindex();fillScope();renderLib();renderChat();
+})();
+</script>
+</body>
+</html>
